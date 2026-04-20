@@ -211,9 +211,26 @@
           </div>
           <div class="admin-actions" style="margin-top:12px;">
             <button id="saveBtn" class="btn-primary">Guardar registro</button>
+            <button id="cancelEditBtn" class="btn-ghost hidden">Cancelar edición</button>
             <button id="importSeedBtn" class="btn-ghost">Importar histórico inicial</button>
           </div>
           <div class="small" style="margin-top:10px;">El desplegable ya lleva cargados los nombres de tu Excel.</div>
+
+          <div style="margin-top:18px;">
+            <div class="label">Últimos registros</div>
+            <div style="overflow:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Nombre</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="adminRecentTable"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <div id="messageBox"></div>
@@ -293,7 +310,7 @@
       const loggedIn = !!currentSession;
       el("adminBox").classList.toggle("hidden", !loggedIn);
       el("logoutBtn").classList.toggle("hidden", !loggedIn);
-      if (loggedIn) showMessage("Sesión iniciada correctamente.", "success");
+      if (loggedIn && !editingSelection) showMessage("Sesión iniciada correctamente.", "success");
     }
 
     function buildPlayerOptions(names){
@@ -333,20 +350,32 @@
     }
 
     async function fetchSelections(){
+      const seedMap = new Map(
+        SEED_HISTORY.map(item => [item.date, { id: `seed-${item.date}`, date: item.date, name: item.name, source: "seed" }])
+      );
+
+      if (!sbClient) {
+        allSelections = [...seedMap.values()].sort((a,b) => b.date.localeCompare(a.date));
+        await fetchPlayers();
+        return;
+      }
+
       const {data,error} = await sbClient
         .from("waterpolista_del_dia")
         .select("id, selection_date, player_name")
         .order("selection_date",{ascending:false});
       if(error) throw error;
-      if((data || []).length){
-        allSelections = data.map(row => ({
+
+      (data || []).forEach(row => {
+        seedMap.set(row.selection_date, {
           id: row.id,
           date: row.selection_date,
-          name: row.player_name || "Sin nombre"
-        }));
-      } else {
-        allSelections = SEED_HISTORY.slice().sort((a,b) => b.date.localeCompare(a.date));
-      }
+          name: row.player_name || "Sin nombre",
+          source: "db"
+        });
+      });
+
+      allSelections = [...seedMap.values()].sort((a,b) => b.date.localeCompare(a.date));
       await fetchPlayers();
     }
 
@@ -419,6 +448,45 @@
             <td>${item.name}</td>
           </tr>`).join("")
         : '<tr><td colspan="2" class="muted">No hay resultados con ese filtro.</td></tr>';
+    }
+
+    function renderAdminRecent(){
+      const tbody = el("adminRecentTable");
+      if (!tbody) return;
+      tbody.innerHTML = allSelections.length
+        ? allSelections.slice(0,20).map(item => `
+          <tr>
+            <td>${fmtDate(item.date)}</td>
+            <td>${item.name}</td>
+            <td><button class="btn-ghost admin-edit-btn" data-date="${item.date}" style="padding:8px 10px;">Editar</button></td>
+          </tr>`).join("")
+        : '<tr><td colspan="3" class="muted">Todavía no hay registros.</td></tr>';
+
+      tbody.querySelectorAll('.admin-edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => startEdit(btn.dataset.date));
+      });
+    }
+
+    function startEdit(date){
+      const found = allSelections.find(item => item.date === date);
+      if (!found) return;
+      editingSelection = found;
+      el("dateInput").value = found.date;
+      el("playerSelect").value = found.name;
+      el("saveBtn").textContent = "Guardar cambios";
+      el("cancelEditBtn").classList.remove("hidden");
+      showMessage(`Editando el registro del ${fmtDate(found.date)}.`, "info");
+      const adminCard = el("adminCard");
+      if (adminCard.classList.contains("hidden")) {
+        adminCard.classList.remove("hidden");
+      }
+      adminCard.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function clearEditMode(){
+      editingSelection = null;
+      el("saveBtn").textContent = "Guardar registro";
+      el("cancelEditBtn").classList.add("hidden");
     }
 
     function renderStreakList(){
@@ -502,6 +570,7 @@
       renderHistory(filtered);
       renderStreakList();
       renderRankingChart(filtered);
+      renderAdminRecent();
     }
 
     async function refreshAll(){
@@ -542,6 +611,7 @@
       currentSession = null;
       el("adminBox").classList.add("hidden");
       el("logoutBtn").classList.add("hidden");
+      clearEditMode();
       showMessage("Sesión cerrada.","info");
     }
 
@@ -559,14 +629,41 @@
       if(!playerName){ showMessage("Selecciona un nombre.","error"); return; }
 
       try{
-        const {error} = await sbClient.from("waterpolista_del_dia").insert({
-          selection_date: date,
-          player_name: playerName
-        });
+        let error = null;
+
+        if (editingSelection && editingSelection.source === "db") {
+          const response = await sbClient
+            .from("waterpolista_del_dia")
+            .update({
+              selection_date: date,
+              player_name: playerName
+            })
+            .eq("id", editingSelection.id);
+          error = response.error;
+        } else if (editingSelection && editingSelection.source === "seed") {
+          const response = await sbClient
+            .from("waterpolista_del_dia")
+            .upsert({
+              selection_date: date,
+              player_name: playerName
+            }, { onConflict: "selection_date" });
+          error = response.error;
+        } else {
+          const response = await sbClient
+            .from("waterpolista_del_dia")
+            .insert({
+              selection_date: date,
+              player_name: playerName
+            });
+          error = response.error;
+        }
+
         if(error){ showMessage(error.message,"error"); return; }
 
-        showMessage("Registro guardado correctamente.","success");
+        showMessage(editingSelection ? "Registro actualizado correctamente." : "Registro guardado correctamente.","success");
         el("playerSelect").value = "";
+        clearEditMode();
+
         if(advanceDate){
           const d = new Date(date + "T12:00:00");
           d.setDate(d.getDate() + 1);
@@ -592,9 +689,18 @@
           player_name: item.name
         }));
 
+        const existingDates = new Set((await sbClient
+          .from("waterpolista_del_dia")
+          .select("selection_date")).data?.map(x => x.selection_date) || []);
+        const filteredPayload = payload.filter(item => !existingDates.has(item.selection_date));
+        if (!filteredPayload.length) {
+          showMessage("No había nada nuevo que importar.", "info");
+          return;
+        }
+
         const {error} = await sbClient
           .from("waterpolista_del_dia")
-          .upsert(payload, { onConflict: "selection_date" });
+          .insert(filteredPayload);
 
         if(error) throw error;
 
@@ -625,6 +731,12 @@
       el("logoutBtn").addEventListener("click", logout);
       el("saveBtn").addEventListener("click", () => saveSelection(false));
       el("saveAndNextBtn").addEventListener("click", () => saveSelection(true));
+      el("cancelEditBtn").addEventListener("click", () => {
+        clearEditMode();
+        clearMessage();
+        el("playerSelect").value = "";
+        setToday();
+      });
       el("importSeedBtn").addEventListener("click", importSeedHistory);
       el("filterYear").addEventListener("change", renderAllViews);
       el("filterMonth").addEventListener("change", renderAllViews);
