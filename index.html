@@ -224,8 +224,8 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "PEGA_AQUI_TU_SUPABASE_URL";
-    const SUPABASE_ANON_KEY = "PEGA_AQUI_TU_SUPABASE_ANON_KEY";
+    const SUPABASE_URL = "https://tprcdmoaxrgzzgdckzei.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwcmNkbW9heHJnenpnZGNremVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDE0MTIsImV4cCI6MjA5MjI3NzQxMn0.Kj4IPtVVrN_078HPnw637M5lc8smEFe_zGqeNoZSacs";
 
     const DEFAULT_PLAYERS = ["Capi", "Castro", "Dani", "David", "Fonso", "Gabri", "Gonzalo", "Huerta", "Jacobo", "Jaime", "Karembe", "Kike", "Lawi", "León", "Lucas", "Mario", "Raúl", "Rubén", "Sergi", "Tacho", "Tripi", "Yago"];
     const SEED_HISTORY = [{"date": "2025-01-01", "name": "León"}, {"date": "2025-01-02", "name": "Fonso"}, {"date": "2025-01-03", "name": "Yago"}, {"date": "2025-01-04", "name": "Huerta"}, {"date": "2025-01-05", "name": "Lawi"}, {"date": "2025-01-06", "name": "Jacobo"}, {"date": "2025-01-07", "name": "Mario"}, {"date": "2025-01-08", "name": "Rubén"}, {"date": "2025-01-09", "name": "Kike"}, {"date": "2025-01-10", "name": "Lucas"}, {"date": "2025-01-11", "name": "Huerta"}, {"date": "2025-01-12", "name": "Jaime"}, {"date": "2025-01-13", "name": "Dani"}, {"date": "2025-01-14", "name": "Gonzalo"}, {"date": "2025-01-15", "name": "Castro"}, {"date": "2025-01-16", "name": "Capi"}, {"date": "2025-01-17", "name": "Capi"}, {"date": "2025-01-18", "name": "Gonzalo"}, {"date": "2025-01-19", "name": "Capi"}, {"date": "2025-01-20", "name": "Lawi"}, {"date": "2025-01-21", "name": "Huerta"}, {"date": "2025-01-22", "name": "Kike"}, {"date": "2025-01-23", "name": "Fonso"}, {"date": "2025-01-24", "name": "Huerta"}, {"date": "2025-01-25", "name": "Rubén"}, {"date": "2025-01-26", "name": "Raúl"}, {"date": "2025-01-27", "name": "Yago"}, {"date": "2025-01-28", "name": "Capi"}, {"date": "2025-01-29", "name": "Tripi"}, {"date": "2025-01-30", "name": "Gabri"}, {"date": "2025-01-31", "name": "Rubén"}, {"date": "2025-02-01", "name": "Huerta"}, {"date": "2025-02-02", "name": "Raúl"}, {"date": "2025-02-03", "name": "Gabri"}, {"date": "2025-02-04", "name": "Jacobo"}, {"date": "2025-02-05", "name": "Tacho"}, {"date": "2025-02-06", "name": "León"}, {"date": "2025-02-07", "name": "Castro"}, {"date": "2025-02-08", "name": "Kike"}, {"date": "2025-02-09", "name": "León"}, {"date": "2025-02-10", "name": "León"}, {"date": "2025-02-11", "name": "Gabri"}, {"date": "2025-02-12", "name": "Tacho"}, {"date": "2025-02-13", "name": "Jacobo"}, {"date": "2025-02-14", "name": "León"}, {"date": "2025-02-15", "name": "Jaime"}, {"date": "2025-02-16", "name": "Gonzalo"}, {"date": "2025-02-17", "name": "Capi"}, {"date": "2025-02-18", "name": "Lawi"}, {"date": "2025-02-19", "name": "Dani"}, {"date": "2025-02-20", "name": "León"}, {"date": "2025-02-21", "name": "Lawi"}, {"date": "2025-02-22", "name": "León"}, {"date": "2025-02-23", "name": "Karembe"}, {"date": "2025-02-24", "name": "Gonzalo"}, {"date": "2025-02-25", "name": "Lucas"}, {"date": "2025-02-26", "name": "Tacho"}, {"date": "2025-02-27", "name": "Lawi"}, {"date": "2025-02-28", "name": "Sergi"}, {"date": "2025-03-01", "name": "Gonzalo"}, {"date": "2025-03-02", "name": "Tripi"}, {"date": "2025-03-03", "name": "Kike"}, {"date": "2025-03-04", "name": "Yago"}, {"date": "2025-03-05", "name": "Yago"}, {"date": "2025-03-06", "name": "Sergi"}, {"date": "2025-03-07", "name": "Sergi"}, {"date": "2025-03-08", "name": "David"}, {"date": "2025-03-09", "name": "Dani"}, {"date": "2025-03-10", "name": "David"}, {"date": "2025-03-11", "name": "Lucas"}, {"date": "2025-03-12", "name": "Tacho"}, {"date": "2025-03-13", "name": "Lucas"}, {"date": "2025-03-14", "name": "Gabri"}, {"date": "2025-03-15", "name": "Dani"}, {"date": "2025-03-16", "name": "Gabri"}, {"date": "2025-03-17", "name": "Rubén"}, {"date": "2025-03-18", "name": "Lucas"}, {"date": "2025-03-19", "name": "Capi"}, {"date": "2025-03-20", "name": "Tacho"}, {"date": "2025-03-21", "name": "Castro"}, {"date": "2025-03-22", "name": "Lawi"}, {"date": "2025-03-23", "name": "Jaime"}, {"date": "2025-03-24", "name": "Gabri"}, {"date": "2025-03-25", "name": "Jaime"}, {"date": "2025-03-26", "name": "Rubén"}, {"date": "2025-03-27", "name": "Yago"}, {"date": "2025-03-28", "name": "Jaime"}, {"date": "2025-03-29", "name": "Tacho"}, {"date": "2025-03-30", "name": "Huerta"}, {"date": "2025-03-31", "name": "Huerta"}, {"date": "2025-04-01", "name": "Kike"}, {"date": "2025-04-02", "name": "Raúl"}, {"date": "2025-04-03", "name": "Dani"}, {"date": "2025-04-04", "name": "Dani"}, {"date": "2025-04-05", "name": "Huerta"}, {"date": "2025-04-06", "name": "Gabri"}, {"date": "2025-04-07", "name": "Jaime"}, {"date": "2025-04-08", "name": "Tripi"}, {"date": "2025-04-09", "name": "Kike"}, {"date": "2025-04-10", "name": "Tacho"}, {"date": "2025-04-11", "name": "David"}, {"date": "2025-04-12", "name": "Kike"}, {"date": "2025-04-13", "name": "Castro"}, {"date": "2025-04-14", "name": "Fonso"}, {"date": "2025-04-15", "name": "Rubén"}, {"date": "2025-04-16", "name": "Jaime"}, {"date": "2025-04-17", "name": "Lawi"}, {"date": "2025-04-18", "name": "Capi"}, {"date": "2025-04-19", "name": "Jacobo"}, {"date": "2025-04-20", "name": "Gonzalo"}, {"date": "2025-04-21", "name": "Kike"}, {"date": "2025-04-22", "name": "Huerta"}, {"date": "2025-04-23", "name": "Kike"}, {"date": "2025-04-24", "name": "Tripi"}, {"date": "2025-04-25", "name": "Raúl"}, {"date": "2025-04-26", "name": "Capi"}, {"date": "2025-04-27", "name": "David"}, {"date": "2025-04-28", "name": "Karembe"}, {"date": "2025-04-29", "name": "Yago"}, {"date": "2025-04-30", "name": "Jaime"}, {"date": "2025-05-01", "name": "Yago"}, {"date": "2025-05-02", "name": "Mario"}, {"date": "2025-05-03", "name": "León"}, {"date": "2025-05-04", "name": "David"}, {"date": "2025-05-05", "name": "Gonzalo"}, {"date": "2025-05-06", "name": "Dani"}, {"date": "2025-05-07", "name": "Lucas"}, {"date": "2025-05-08", "name": "Tripi"}, {"date": "2025-05-09", "name": "Gabri"}, {"date": "2025-05-10", "name": "Castro"}, {"date": "2025-05-11", "name": "Jaime"}, {"date": "2025-05-12", "name": "Sergi"}, {"date": "2025-05-13", "name": "Capi"}, {"date": "2025-05-14", "name": "Raúl"}, {"date": "2025-05-15", "name": "Fonso"}, {"date": "2025-05-16", "name": "Jaime"}, {"date": "2025-05-17", "name": "David"}, {"date": "2025-05-18", "name": "Jaime"}, {"date": "2025-05-19", "name": "Mario"}, {"date": "2025-05-20", "name": "Mario"}, {"date": "2025-05-21", "name": "Fonso"}, {"date": "2025-05-22", "name": "Karembe"}, {"date": "2025-05-23", "name": "Raúl"}, {"date": "2025-05-24", "name": "Tripi"}, {"date": "2025-05-25", "name": "Sergi"}, {"date": "2025-05-26", "name": "Jacobo"}, {"date": "2025-05-27", "name": "Jacobo"}, {"date": "2025-05-28", "name": "Gonzalo"}, {"date": "2025-05-29", "name": "Fonso"}, {"date": "2025-05-30", "name": "Karembe"}, {"date": "2025-05-31", "name": "Fonso"}, {"date": "2025-06-01", "name": "Yago"}, {"date": "2025-06-02", "name": "Mario"}, {"date": "2025-06-03", "name": "Mario"}, {"date": "2025-06-04", "name": "Castro"}, {"date": "2025-06-05", "name": "Karembe"}, {"date": "2025-06-06", "name": "Sergi"}, {"date": "2025-06-07", "name": "Gabri"}, {"date": "2025-06-08", "name": "Jacobo"}, {"date": "2025-06-09", "name": "Fonso"}, {"date": "2025-06-10", "name": "León"}, {"date": "2025-06-11", "name": "Gabri"}, {"date": "2025-06-12", "name": "Tacho"}, {"date": "2025-06-13", "name": "Rubén"}, {"date": "2025-06-14", "name": "Jaime"}, {"date": "2025-06-15", "name": "Kike"}, {"date": "2025-06-16", "name": "Sergi"}, {"date": "2025-06-17", "name": "Huerta"}, {"date": "2025-06-18", "name": "Rubén"}, {"date": "2025-06-19", "name": "Sergi"}, {"date": "2025-06-20", "name": "Capi"}, {"date": "2025-06-21", "name": "León"}, {"date": "2025-06-22", "name": "Sergi"}, {"date": "2025-06-23", "name": "Raúl"}, {"date": "2025-06-24", "name": "Lucas"}, {"date": "2025-06-25", "name": "Jacobo"}, {"date": "2025-06-26", "name": "Dani"}, {"date": "2025-06-27", "name": "Capi"}, {"date": "2025-06-28", "name": "Dani"}, {"date": "2025-06-29", "name": "Rubén"}, {"date": "2025-06-30", "name": "Huerta"}, {"date": "2025-07-01", "name": "Jacobo"}, {"date": "2025-07-02", "name": "Mario"}, {"date": "2025-07-03", "name": "Karembe"}, {"date": "2025-07-04", "name": "Sergi"}, {"date": "2025-07-05", "name": "Jacobo"}, {"date": "2025-07-06", "name": "Tripi"}, {"date": "2025-07-07", "name": "Jaime"}, {"date": "2025-07-08", "name": "Lucas"}, {"date": "2025-07-09", "name": "Sergi"}, {"date": "2025-07-10", "name": "Jacobo"}, {"date": "2025-07-11", "name": "Yago"}, {"date": "2025-07-12", "name": "Jaime"}, {"date": "2025-07-13", "name": "Gabri"}, {"date": "2025-07-14", "name": "León"}, {"date": "2025-07-15", "name": "Tripi"}, {"date": "2025-07-16", "name": "Sergi"}, {"date": "2025-07-17", "name": "Yago"}, {"date": "2025-07-18", "name": "Lawi"}, {"date": "2025-07-19", "name": "Jaime"}, {"date": "2025-07-20", "name": "Karembe"}, {"date": "2025-07-21", "name": "Raúl"}, {"date": "2025-07-22", "name": "David"}, {"date": "2025-07-23", "name": "Dani"}, {"date": "2025-07-24", "name": "Tripi"}, {"date": "2025-07-25", "name": "León"}, {"date": "2025-07-26", "name": "Castro"}, {"date": "2025-07-27", "name": "Lucas"}, {"date": "2025-07-28", "name": "Fonso"}, {"date": "2025-07-29", "name": "Capi"}, {"date": "2025-07-30", "name": "Castro"}, {"date": "2025-07-31", "name": "Fonso"}, {"date": "2025-08-01", "name": "Lawi"}, {"date": "2025-08-02", "name": "Gabri"}, {"date": "2025-08-03", "name": "Karembe"}, {"date": "2025-08-04", "name": "León"}, {"date": "2025-08-05", "name": "Dani"}, {"date": "2025-08-06", "name": "Jaime"}, {"date": "2025-08-07", "name": "David"}, {"date": "2025-08-08", "name": "Raúl"}, {"date": "2025-08-09", "name": "Castro"}, {"date": "2025-08-10", "name": "Mario"}, {"date": "2025-08-11", "name": "Gonzalo"}, {"date": "2025-08-12", "name": "Karembe"}, {"date": "2025-08-13", "name": "Tacho"}, {"date": "2025-08-14", "name": "Lucas"}, {"date": "2025-08-15", "name": "León"}, {"date": "2025-08-16", "name": "Tripi"}, {"date": "2025-08-17", "name": "Karembe"}, {"date": "2025-08-18", "name": "Kike"}, {"date": "2025-08-19", "name": "Karembe"}, {"date": "2025-08-20", "name": "León"}, {"date": "2025-08-21", "name": "Gabri"}, {"date": "2025-08-22", "name": "Yago"}, {"date": "2025-08-23", "name": "Sergi"}, {"date": "2025-08-24", "name": "Kike"}, {"date": "2025-08-25", "name": "Dani"}, {"date": "2025-08-26", "name": "Jacobo"}, {"date": "2025-08-27", "name": "Dani"}, {"date": "2025-08-28", "name": "Lucas"}, {"date": "2025-08-29", "name": "Gabri"}, {"date": "2025-08-30", "name": "Raúl"}, {"date": "2025-08-31", "name": "Lawi"}, {"date": "2025-09-01", "name": "Tacho"}, {"date": "2025-09-02", "name": "Rubén"}, {"date": "2025-09-03", "name": "Mario"}, {"date": "2025-09-04", "name": "Lucas"}, {"date": "2025-09-05", "name": "Dani"}, {"date": "2025-09-06", "name": "Tripi"}, {"date": "2025-09-07", "name": "Dani"}, {"date": "2025-09-08", "name": "León"}, {"date": "2025-09-09", "name": "Sergi"}, {"date": "2025-09-10", "name": "Karembe"}, {"date": "2025-09-11", "name": "Karembe"}, {"date": "2025-09-12", "name": "Fonso"}, {"date": "2025-09-13", "name": "Huerta"}, {"date": "2025-09-14", "name": "David"}, {"date": "2025-09-15", "name": "Sergi"}, {"date": "2025-09-16", "name": "Karembe"}, {"date": "2025-09-17", "name": "Jaime"}, {"date": "2025-09-18", "name": "Castro"}, {"date": "2025-09-19", "name": "Sergi"}, {"date": "2025-09-20", "name": "Capi"}, {"date": "2025-09-21", "name": "Jacobo"}, {"date": "2025-09-22", "name": "Yago"}, {"date": "2025-09-23", "name": "Mario"}, {"date": "2025-09-24", "name": "Dani"}, {"date": "2025-09-25", "name": "Huerta"}, {"date": "2025-09-26", "name": "Lucas"}, {"date": "2025-09-27", "name": "Capi"}, {"date": "2025-09-28", "name": "Fonso"}, {"date": "2025-09-29", "name": "Dani"}, {"date": "2025-09-30", "name": "Lucas"}, {"date": "2025-10-01", "name": "Jacobo"}, {"date": "2025-10-02", "name": "Yago"}, {"date": "2025-10-03", "name": "Rubén"}, {"date": "2025-10-04", "name": "Karembe"}, {"date": "2025-10-05", "name": "Tripi"}, {"date": "2025-10-06", "name": "Yago"}, {"date": "2025-10-07", "name": "León"}, {"date": "2025-10-08", "name": "Rubén"}, {"date": "2025-10-09", "name": "Lucas"}, {"date": "2025-10-10", "name": "Capi"}, {"date": "2025-10-11", "name": "Dani"}, {"date": "2025-10-12", "name": "David"}, {"date": "2025-10-13", "name": "Tripi"}, {"date": "2025-10-14", "name": "Lucas"}, {"date": "2025-10-15", "name": "Jacobo"}, {"date": "2025-10-16", "name": "Dani"}, {"date": "2025-10-17", "name": "Dani"}, {"date": "2025-10-18", "name": "Jaime"}, {"date": "2025-10-19", "name": "Lucas"}, {"date": "2025-10-20", "name": "Lawi"}, {"date": "2025-10-21", "name": "Lucas"}, {"date": "2025-10-22", "name": "Yago"}, {"date": "2025-10-23", "name": "Rubén"}, {"date": "2025-10-24", "name": "Tacho"}, {"date": "2025-10-25", "name": "Lawi"}, {"date": "2025-10-26", "name": "Jacobo"}, {"date": "2025-10-27", "name": "Castro"}, {"date": "2025-10-28", "name": "Gabri"}, {"date": "2025-10-29", "name": "Lucas"}, {"date": "2025-10-30", "name": "Fonso"}, {"date": "2025-10-31", "name": "Lucas"}, {"date": "2025-11-01", "name": "Lucas"}, {"date": "2025-11-02", "name": "Capi"}, {"date": "2025-11-03", "name": "David"}, {"date": "2025-11-04", "name": "David"}, {"date": "2025-11-05", "name": "Fonso"}, {"date": "2025-11-06", "name": "David"}, {"date": "2025-11-07", "name": "Tacho"}, {"date": "2025-11-08", "name": "Castro"}, {"date": "2025-11-09", "name": "Jacobo"}, {"date": "2025-11-10", "name": "Capi"}, {"date": "2025-11-11", "name": "Mario"}, {"date": "2025-11-12", "name": "Lucas"}, {"date": "2025-11-13", "name": "Tacho"}, {"date": "2025-11-14", "name": "Karembe"}, {"date": "2025-11-15", "name": "Rubén"}, {"date": "2025-11-16", "name": "Kike"}, {"date": "2025-11-17", "name": "Lucas"}, {"date": "2025-11-18", "name": "Mario"}, {"date": "2025-11-19", "name": "Mario"}, {"date": "2025-11-21", "name": "Gonzalo"}, {"date": "2025-11-22", "name": "León"}, {"date": "2025-11-23", "name": "Gonzalo"}, {"date": "2025-11-25", "name": "Fonso"}, {"date": "2025-11-26", "name": "Dani"}, {"date": "2025-11-27", "name": "Tacho"}, {"date": "2025-11-28", "name": "Gonzalo"}, {"date": "2025-11-29", "name": "David"}, {"date": "2025-11-30", "name": "Rubén"}, {"date": "2025-12-01", "name": "Sergi"}, {"date": "2025-12-02", "name": "Tacho"}, {"date": "2025-12-03", "name": "Castro"}, {"date": "2025-12-04", "name": "Jaime"}, {"date": "2025-12-05", "name": "León"}, {"date": "2025-12-06", "name": "David"}, {"date": "2025-12-07", "name": "Lucas"}, {"date": "2025-12-08", "name": "Huerta"}, {"date": "2025-12-09", "name": "David"}, {"date": "2025-12-10", "name": "Rubén"}, {"date": "2025-12-11", "name": "Tripi"}, {"date": "2025-12-12", "name": "Tacho"}, {"date": "2025-12-13", "name": "Karembe"}, {"date": "2025-12-14", "name": "Karembe"}, {"date": "2025-12-15", "name": "Sergi"}, {"date": "2025-12-16", "name": "Sergi"}, {"date": "2025-12-17", "name": "Jacobo"}, {"date": "2025-12-18", "name": "Lawi"}, {"date": "2025-12-19", "name": "Capi"}, {"date": "2025-12-20", "name": "Lawi"}, {"date": "2025-12-21", "name": "Lawi"}, {"date": "2025-12-22", "name": "Rubén"}, {"date": "2025-12-23", "name": "Tripi"}, {"date": "2025-12-24", "name": "Dani"}, {"date": "2025-12-25", "name": "Jaime"}, {"date": "2025-12-26", "name": "Sergi"}, {"date": "2025-12-27", "name": "Lucas"}, {"date": "2025-12-28", "name": "David"}, {"date": "2025-12-29", "name": "Tripi"}, {"date": "2025-12-30", "name": "Capi"}, {"date": "2025-12-31", "name": "Castro"}, {"date": "2026-01-01", "name": "Karembe"}, {"date": "2026-01-02", "name": "Fonso"}, {"date": "2026-01-03", "name": "Sergi"}, {"date": "2026-01-04", "name": "Jacobo"}, {"date": "2026-01-05", "name": "León"}, {"date": "2026-01-06", "name": "Huerta"}, {"date": "2026-01-07", "name": "Lawi"}, {"date": "2026-01-08", "name": "Capi"}, {"date": "2026-01-09", "name": "Capi"}, {"date": "2026-01-10", "name": "Castro"}, {"date": "2026-01-11", "name": "Dani"}, {"date": "2026-01-12", "name": "David"}, {"date": "2026-01-13", "name": "Castro"}, {"date": "2026-01-14", "name": "Jacobo"}, {"date": "2026-01-15", "name": "Castro"}, {"date": "2026-01-16", "name": "Fonso"}, {"date": "2026-01-17", "name": "Jaime"}, {"date": "2026-01-18", "name": "Gonzalo"}, {"date": "2026-01-19", "name": "Tacho"}, {"date": "2026-01-20", "name": "Capi"}, {"date": "2026-01-21", "name": "Gabri"}, {"date": "2026-01-22", "name": "Huerta"}, {"date": "2026-01-23", "name": "Mario"}, {"date": "2026-01-24", "name": "Tripi"}, {"date": "2026-01-25", "name": "Raúl"}, {"date": "2026-01-26", "name": "Raúl"}, {"date": "2026-01-27", "name": "Lawi"}, {"date": "2026-01-28", "name": "Tacho"}, {"date": "2026-01-29", "name": "Fonso"}, {"date": "2026-01-30", "name": "Huerta"}, {"date": "2026-01-31", "name": "Gonzalo"}, {"date": "2026-02-01", "name": "David"}, {"date": "2026-02-02", "name": "Dani"}, {"date": "2026-02-03", "name": "Lawi"}, {"date": "2026-02-04", "name": "Huerta"}, {"date": "2026-02-05", "name": "Tacho"}, {"date": "2026-02-06", "name": "David"}, {"date": "2026-02-07", "name": "Jacobo"}, {"date": "2026-02-08", "name": "Tripi"}, {"date": "2026-02-09", "name": "Tripi"}, {"date": "2026-02-10", "name": "Karembe"}, {"date": "2026-02-11", "name": "León"}, {"date": "2026-02-12", "name": "Tacho"}, {"date": "2026-02-13", "name": "Lawi"}, {"date": "2026-02-14", "name": "Tripi"}, {"date": "2026-02-15", "name": "Capi"}, {"date": "2026-02-16", "name": "Gonzalo"}, {"date": "2026-02-17", "name": "Lawi"}, {"date": "2026-02-18", "name": "Mario"}, {"date": "2026-02-19", "name": "Huerta"}, {"date": "2026-02-20", "name": "Mario"}, {"date": "2026-02-21", "name": "Castro"}, {"date": "2026-02-22", "name": "Karembe"}, {"date": "2026-02-23", "name": "León"}, {"date": "2026-02-24", "name": "Tacho"}, {"date": "2026-02-25", "name": "Lawi"}, {"date": "2026-02-26", "name": "Gonzalo"}, {"date": "2026-02-27", "name": "Lawi"}, {"date": "2026-02-28", "name": "Gonzalo"}, {"date": "2026-03-01", "name": "Yago"}, {"date": "2026-03-02", "name": "Yago"}, {"date": "2026-03-03", "name": "Kike"}, {"date": "2026-03-04", "name": "Huerta"}, {"date": "2026-03-05", "name": "Huerta"}, {"date": "2026-03-06", "name": "Dani"}, {"date": "2026-03-07", "name": "Gonzalo"}, {"date": "2026-03-08", "name": "David"}, {"date": "2026-03-09", "name": "Jacobo"}, {"date": "2026-03-10", "name": "Mario"}, {"date": "2026-03-11", "name": "Huerta"}, {"date": "2026-03-12", "name": "Rubén"}, {"date": "2026-03-13", "name": "Lucas"}, {"date": "2026-03-14", "name": "Gonzalo"}, {"date": "2026-03-15", "name": "León"}, {"date": "2026-03-16", "name": "Capi"}, {"date": "2026-03-17", "name": "Raúl"}, {"date": "2026-03-18", "name": "David"}, {"date": "2026-03-19", "name": "Jacobo"}, {"date": "2026-03-20", "name": "Jaime"}, {"date": "2026-03-21", "name": "Lawi"}, {"date": "2026-03-22", "name": "Lucas"}, {"date": "2026-03-23", "name": "Dani"}, {"date": "2026-03-24", "name": "Lucas"}, {"date": "2026-03-25", "name": "Fonso"}, {"date": "2026-03-26", "name": "Rubén"}, {"date": "2026-03-27", "name": "Kike"}, {"date": "2026-03-28", "name": "Jaime"}, {"date": "2026-03-29", "name": "Tacho"}, {"date": "2026-03-30", "name": "Tacho"}, {"date": "2026-03-31", "name": "Yago"}];
@@ -309,26 +309,30 @@
     }
 
     async function fetchPlayers(){
-      const {data,error} = await supabase
-        .from("players")
-        .select("id, name")
-        .order("name",{ascending:true});
-      if(error) throw error;
-      allPlayers = data || [];
+      const combinedNames = [...new Set([
+        ...DEFAULT_PLAYERS,
+        ...allSelections.map(x => x.name).filter(Boolean)
+      ])].sort((a,b)=>a.localeCompare(b,"es"));
+      allPlayers = combinedNames.map((name, index) => ({ id: index + 1, name }));
       renderPlayerSelect();
     }
 
     async function fetchSelections(){
       const {data,error} = await supabase
-        .from("selections")
-        .select("id, selection_date, players(name)")
+        .from("waterpolista_del_dia")
+        .select("id, selection_date, player_name")
         .order("selection_date",{ascending:false});
       if(error) throw error;
-      allSelections = (data || []).map(row => ({
-        id: row.id,
-        date: row.selection_date,
-        name: row.players?.name || "Sin nombre"
-      }));
+      if((data || []).length){
+        allSelections = data.map(row => ({
+          id: row.id,
+          date: row.selection_date,
+          name: row.player_name || "Sin nombre"
+        }));
+      } else {
+        allSelections = SEED_HISTORY.slice().sort((a,b) => b.date.localeCompare(a.date));
+      }
+      await fetchPlayers();
     }
 
     function ensureFilterOptions(){
@@ -469,12 +473,12 @@
       }
       try{
         await loadSession();
-        await fetchPlayers();
         await fetchSelections();
         renderAllViews();
       }catch(error){
         console.error(error);
         showMessage(error.message || "Error cargando los datos.","error");
+        renderAllViews();
       }
     }
 
@@ -502,23 +506,6 @@
       showMessage("Sesión cerrada.","info");
     }
 
-    async function ensurePlayerByName(name){
-      const clean = (name || "").trim();
-      if(!clean) return null;
-
-      let existing = allPlayers.find(p => p.name.toLowerCase() === clean.toLowerCase());
-      if(existing) return existing.id;
-
-      const {data,error} = await supabase.from("players").insert({name: clean}).select("id, name").single();
-      if(error){
-        const duplicate = String(error.message || "").toLowerCase().includes("duplicate") || String(error.code || "") === "23505";
-        if(!duplicate) throw error;
-      }
-      await fetchPlayers();
-      existing = allPlayers.find(p => p.name.toLowerCase() === clean.toLowerCase());
-      return existing ? existing.id : data?.id || null;
-    }
-
     async function saveSelection(advanceDate = false){
       clearMessage();
       if(!currentSession){
@@ -533,10 +520,9 @@
       if(!playerName){ showMessage("Selecciona un nombre.","error"); return; }
 
       try{
-        const playerId = await ensurePlayerByName(playerName);
-        const {error} = await supabase.from("selections").insert({
+        const {error} = await supabase.from("waterpolista_del_dia").insert({
           selection_date: date,
-          player_id: playerId
+          player_name: playerName
         });
         if(error){ showMessage(error.message,"error"); return; }
 
@@ -559,33 +545,21 @@
         showMessage("Primero inicia sesión.","error");
         return;
       }
-      if(!confirm("Esto intentará importar todo el histórico del Excel. Las fechas que ya existan fallarán por duplicado y se ignorarán. ¿Seguir?")) return;
+      if(!confirm("Esto intentará importar todo el histórico del Excel. Las fechas que ya existan se dejarán como están. ¿Seguir?")) return;
 
       try{
-        for (const name of DEFAULT_PLAYERS){
-          await ensurePlayerByName(name);
-        }
-
-        const playerMap = {};
-        allPlayers.forEach(p => playerMap[p.name] = p.id);
-
-        const payload = SEED_HISTORY
-          .filter(item => playerMap[item.name])
-          .map(item => ({
-            selection_date: item.date,
-            player_id: playerMap[item.name]
-          }));
+        const payload = SEED_HISTORY.map(item => ({
+          selection_date: item.date,
+          player_name: item.name
+        }));
 
         const {error} = await supabase
-          .from("selections")
-          .upsert(payload, { onConflict: "selection_date", ignoreDuplicates: true });
+          .from("waterpolista_del_dia")
+          .upsert(payload, { onConflict: "selection_date" });
 
-        if(error){
-          const msg = String(error.message || "");
-          if (!msg.toLowerCase().includes("ignoreduplicates")) throw error;
-        }
+        if(error) throw error;
 
-        showMessage("Importación completada. Si ya había fechas cargadas, simplemente se han dejado como estaban.","success");
+        showMessage("Importación completada correctamente.","success");
         await refreshAll();
       }catch(error){
         console.error(error);
