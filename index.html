@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pachanga Waterpolo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --bg2:#111827;
+      --card:#1e293b;
+      --line:rgba(255,255,255,.08);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --shadow:0 10px 30px rgba(0,0,0,.22);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#0b1120 0%,#0f172a 100%);
+      color:var(--text);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:20px}
+    .hero{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+    .title-row{display:flex;align-items:center;gap:14px}
+    h1{margin:0;font-size:clamp(28px,4vw,42px);line-height:1.04}
+    .sub{margin-top:6px;color:var(--muted)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button,select,input{font:inherit}
+    button{
+      border:0;border-radius:12px;padding:12px 16px;cursor:pointer;color:#fff;transition:.18s ease;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--accent2),#16a34a)}
+    .btn-secondary{background:linear-gradient(135deg,var(--accent),#2563eb)}
+    .btn-ghost{background:rgba(255,255,255,.08)}
+    .btn-danger{background:linear-gradient(135deg,var(--danger),#dc2626)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)
+    }
+    .stat{grid-column:span 3}
+    .chart{grid-column:span 8}
+    .side{grid-column:span 4}
+    .half{grid-column:span 6}
+    .full{grid-column:1 / -1}
+    @media (max-width:950px){.stat,.chart,.side,.half{grid-column:1/-1}}
+    .label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+    .value{font-size:34px;font-weight:800;line-height:1}
+    .small{color:var(--muted);font-size:14px}
+    .toolbar,.admin-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .toolbar{margin-bottom:14px}
+    .field{flex:1;min-width:160px}
+    input,select{
+      width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.05);color:var(--text);outline:none
+    }
+    input::placeholder{color:#94a3b8}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px solid var(--line);font-size:14px}
+    th{color:var(--muted);font-weight:600}
+    tr:last-child td{border-bottom:0}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .list-item{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)
+    }
+    .pill{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:48px;padding:7px 10px;border-radius:999px;
+      background:rgba(56,189,248,.16);color:#bae6fd;font-size:12px;font-weight:800
+    }
+    .hidden{display:none!important}
+    .login-box,.admin-box{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+    .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+    .form-grid .full-row{grid-column:1/-1}
+    @media (max-width:800px){.form-grid{grid-template-columns:1fr}}
+    .notice{border-radius:14px;padding:12px 14px;margin-top:12px;font-size:14px}
+    .notice.info{background:rgba(56,189,248,.1);color:#bae6fd}
+    .notice.error{background:rgba(239,68,68,.1);color:#fecaca}
+    .notice.success{background:rgba(34,197,94,.1);color:#bbf7d0}
+    .muted{color:var(--muted)}
+    code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .footer{color:var(--muted);margin:24px 0 8px;text-align:center;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <div class="title-row">
+<div>
+            <h1>Pachanga Waterpolo</h1>
+            <div class="sub">Dashboard online del Waterpolista del día</div>
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="refreshBtn" class="btn-secondary">Actualizar</button>
+        <button id="toggleAdminBtn" class="btn-ghost">Admin</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card stat">
+        <div class="label">Registros totales</div>
+        <div class="value" id="totalSelections">0</div>
+        <div class="small">Días guardados</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Waterpolistas</div>
+        <div class="value" id="uniquePlayers">0</div>
+        <div class="small">Participantes distintos</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Año visible</div>
+        <div class="value" id="activeYear">Todos</div>
+        <div class="small">Según el filtro actual</div>
+      </article>
+      <article class="card stat">
+        <div class="label">Último señalado</div>
+        <div class="value" id="lastWinner">—</div>
+        <div class="small" id="lastWinnerDate">Sin datos</div>
+      </article>
+
+      <article class="card chart">
+        <div class="label">Ranking del Waterpolista del día</div>
+        <canvas id="rankingChart" height="120"></canvas>
+      </article>
+
+      <article class="card side">
+        <div class="label">Top 5</div>
+        <div id="topList" class="list"></div>
+      </article>
+
+      <article class="card half">
+        <div class="label">Histórico</div>
+        <div class="toolbar">
+          <div class="field">
+            <select id="filterYear"></select>
+          </div>
+          <div class="field">
+            <select id="filterMonth"></select>
+          </div>
+          <div class="field">
+            <select id="filterPlayer"></select>
+          </div>
+        </div>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Nombre</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card half">
+        <div class="label">Quién lleva más sin salir</div>
+        <div id="streakList" class="list"></div>
+      </article>
+
+      <article id="adminCard" class="card full hidden">
+        <div class="label">Zona admin</div>
+        <div class="small">Solo para ti. Puedes cargar cualquier fecha pasada, así que sirve para meter varios días del tirón.</div>
+
+        <div id="loginBox" class="login-box">
+          <div class="form-grid" style="grid-template-columns:repeat(2,1fr);">
+            <div class="field">
+              <label class="small">Email</label>
+              <input id="emailInput" type="email" placeholder="tu@email.com" />
+            </div>
+            <div class="field">
+              <label class="small">Contraseña</label>
+              <input id="passwordInput" type="password" placeholder="••••••••" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px;">
+            <button id="loginBtn" class="btn-primary">Entrar</button>
+            <button id="logoutBtn" class="btn-danger hidden">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div id="adminBox" class="admin-box hidden">
+          <div class="small">Registrar Waterpolista del día</div>
+          <div class="form-grid">
+            <div class="field">
+              <label class="small">Fecha</label>
+              <input id="dateInput" type="date" />
+            </div>
+            <div class="field">
+              <label class="small">Nombre</label>
+              <select id="playerSelect"></select>
+            </div>
+            <div class="field">
+              <label class="small">Guardar rápido</label>
+              <button id="saveAndNextBtn" class="btn-secondary" style="width:100%;height:45px;">Guardar y seguir</button>
+            </div>
+          </div>
+          <div class="admin-actions" style="margin-top:12px;">
+            <button id="saveBtn" class="btn-primary">Guardar registro</button>
+            <button id="importSeedBtn" class="btn-ghost">Importar histórico inicial</button>
+          </div>
+          <div class="small" style="margin-top:10px;">El desplegable ya lleva cargados los nombres de tu Excel.</div>
+        </div>
+
+        <div id="messageBox"></div>
+      </article>
+    </section>
+
+    <div class="footer">Público para el grupo. Admin solo para ti.</div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "PEGA_AQUI_TU_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "PEGA_AQUI_TU_SUPABASE_ANON_KEY";
+
+    const DEFAULT_PLAYERS = ["Capi", "Castro", "Dani", "David", "Fonso", "Gabri", "Gonzalo", "Huerta", "Jacobo", "Jaime", "Karembe", "Kike", "Lawi", "León", "Lucas", "Mario", "Raúl", "Rubén", "Sergi", "Tacho", "Tripi", "Yago"];
+    const SEED_HISTORY = [{"date": "2025-01-01", "name": "León"}, {"date": "2025-01-02", "name": "Fonso"}, {"date": "2025-01-03", "name": "Yago"}, {"date": "2025-01-04", "name": "Huerta"}, {"date": "2025-01-05", "name": "Lawi"}, {"date": "2025-01-06", "name": "Jacobo"}, {"date": "2025-01-07", "name": "Mario"}, {"date": "2025-01-08", "name": "Rubén"}, {"date": "2025-01-09", "name": "Kike"}, {"date": "2025-01-10", "name": "Lucas"}, {"date": "2025-01-11", "name": "Huerta"}, {"date": "2025-01-12", "name": "Jaime"}, {"date": "2025-01-13", "name": "Dani"}, {"date": "2025-01-14", "name": "Gonzalo"}, {"date": "2025-01-15", "name": "Castro"}, {"date": "2025-01-16", "name": "Capi"}, {"date": "2025-01-17", "name": "Capi"}, {"date": "2025-01-18", "name": "Gonzalo"}, {"date": "2025-01-19", "name": "Capi"}, {"date": "2025-01-20", "name": "Lawi"}, {"date": "2025-01-21", "name": "Huerta"}, {"date": "2025-01-22", "name": "Kike"}, {"date": "2025-01-23", "name": "Fonso"}, {"date": "2025-01-24", "name": "Huerta"}, {"date": "2025-01-25", "name": "Rubén"}, {"date": "2025-01-26", "name": "Raúl"}, {"date": "2025-01-27", "name": "Yago"}, {"date": "2025-01-28", "name": "Capi"}, {"date": "2025-01-29", "name": "Tripi"}, {"date": "2025-01-30", "name": "Gabri"}, {"date": "2025-01-31", "name": "Rubén"}, {"date": "2025-02-01", "name": "Huerta"}, {"date": "2025-02-02", "name": "Raúl"}, {"date": "2025-02-03", "name": "Gabri"}, {"date": "2025-02-04", "name": "Jacobo"}, {"date": "2025-02-05", "name": "Tacho"}, {"date": "2025-02-06", "name": "León"}, {"date": "2025-02-07", "name": "Castro"}, {"date": "2025-02-08", "name": "Kike"}, {"date": "2025-02-09", "name": "León"}, {"date": "2025-02-10", "name": "León"}, {"date": "2025-02-11", "name": "Gabri"}, {"date": "2025-02-12", "name": "Tacho"}, {"date": "2025-02-13", "name": "Jacobo"}, {"date": "2025-02-14", "name": "León"}, {"date": "2025-02-15", "name": "Jaime"}, {"date": "2025-02-16", "name": "Gonzalo"}, {"date": "2025-02-17", "name": "Capi"}, {"date": "2025-02-18", "name": "Lawi"}, {"date": "2025-02-19", "name": "Dani"}, {"date": "2025-02-20", "name": "León"}, {"date": "2025-02-21", "name": "Lawi"}, {"date": "2025-02-22", "name": "León"}, {"date": "2025-02-23", "name": "Karembe"}, {"date": "2025-02-24", "name": "Gonzalo"}, {"date": "2025-02-25", "name": "Lucas"}, {"date": "2025-02-26", "name": "Tacho"}, {"date": "2025-02-27", "name": "Lawi"}, {"date": "2025-02-28", "name": "Sergi"}, {"date": "2025-03-01", "name": "Gonzalo"}, {"date": "2025-03-02", "name": "Tripi"}, {"date": "2025-03-03", "name": "Kike"}, {"date": "2025-03-04", "name": "Yago"}, {"date": "2025-03-05", "name": "Yago"}, {"date": "2025-03-06", "name": "Sergi"}, {"date": "2025-03-07", "name": "Sergi"}, {"date": "2025-03-08", "name": "David"}, {"date": "2025-03-09", "name": "Dani"}, {"date": "2025-03-10", "name": "David"}, {"date": "2025-03-11", "name": "Lucas"}, {"date": "2025-03-12", "name": "Tacho"}, {"date": "2025-03-13", "name": "Lucas"}, {"date": "2025-03-14", "name": "Gabri"}, {"date": "2025-03-15", "name": "Dani"}, {"date": "2025-03-16", "name": "Gabri"}, {"date": "2025-03-17", "name": "Rubén"}, {"date": "2025-03-18", "name": "Lucas"}, {"date": "2025-03-19", "name": "Capi"}, {"date": "2025-03-20", "name": "Tacho"}, {"date": "2025-03-21", "name": "Castro"}, {"date": "2025-03-22", "name": "Lawi"}, {"date": "2025-03-23", "name": "Jaime"}, {"date": "2025-03-24", "name": "Gabri"}, {"date": "2025-03-25", "name": "Jaime"}, {"date": "2025-03-26", "name": "Rubén"}, {"date": "2025-03-27", "name": "Yago"}, {"date": "2025-03-28", "name": "Jaime"}, {"date": "2025-03-29", "name": "Tacho"}, {"date": "2025-03-30", "name": "Huerta"}, {"date": "2025-03-31", "name": "Huerta"}, {"date": "2025-04-01", "name": "Kike"}, {"date": "2025-04-02", "name": "Raúl"}, {"date": "2025-04-03", "name": "Dani"}, {"date": "2025-04-04", "name": "Dani"}, {"date": "2025-04-05", "name": "Huerta"}, {"date": "2025-04-06", "name": "Gabri"}, {"date": "2025-04-07", "name": "Jaime"}, {"date": "2025-04-08", "name": "Tripi"}, {"date": "2025-04-09", "name": "Kike"}, {"date": "2025-04-10", "name": "Tacho"}, {"date": "2025-04-11", "name": "David"}, {"date": "2025-04-12", "name": "Kike"}, {"date": "2025-04-13", "name": "Castro"}, {"date": "2025-04-14", "name": "Fonso"}, {"date": "2025-04-15", "name": "Rubén"}, {"date": "2025-04-16", "name": "Jaime"}, {"date": "2025-04-17", "name": "Lawi"}, {"date": "2025-04-18", "name": "Capi"}, {"date": "2025-04-19", "name": "Jacobo"}, {"date": "2025-04-20", "name": "Gonzalo"}, {"date": "2025-04-21", "name": "Kike"}, {"date": "2025-04-22", "name": "Huerta"}, {"date": "2025-04-23", "name": "Kike"}, {"date": "2025-04-24", "name": "Tripi"}, {"date": "2025-04-25", "name": "Raúl"}, {"date": "2025-04-26", "name": "Capi"}, {"date": "2025-04-27", "name": "David"}, {"date": "2025-04-28", "name": "Karembe"}, {"date": "2025-04-29", "name": "Yago"}, {"date": "2025-04-30", "name": "Jaime"}, {"date": "2025-05-01", "name": "Yago"}, {"date": "2025-05-02", "name": "Mario"}, {"date": "2025-05-03", "name": "León"}, {"date": "2025-05-04", "name": "David"}, {"date": "2025-05-05", "name": "Gonzalo"}, {"date": "2025-05-06", "name": "Dani"}, {"date": "2025-05-07", "name": "Lucas"}, {"date": "2025-05-08", "name": "Tripi"}, {"date": "2025-05-09", "name": "Gabri"}, {"date": "2025-05-10", "name": "Castro"}, {"date": "2025-05-11", "name": "Jaime"}, {"date": "2025-05-12", "name": "Sergi"}, {"date": "2025-05-13", "name": "Capi"}, {"date": "2025-05-14", "name": "Raúl"}, {"date": "2025-05-15", "name": "Fonso"}, {"date": "2025-05-16", "name": "Jaime"}, {"date": "2025-05-17", "name": "David"}, {"date": "2025-05-18", "name": "Jaime"}, {"date": "2025-05-19", "name": "Mario"}, {"date": "2025-05-20", "name": "Mario"}, {"date": "2025-05-21", "name": "Fonso"}, {"date": "2025-05-22", "name": "Karembe"}, {"date": "2025-05-23", "name": "Raúl"}, {"date": "2025-05-24", "name": "Tripi"}, {"date": "2025-05-25", "name": "Sergi"}, {"date": "2025-05-26", "name": "Jacobo"}, {"date": "2025-05-27", "name": "Jacobo"}, {"date": "2025-05-28", "name": "Gonzalo"}, {"date": "2025-05-29", "name": "Fonso"}, {"date": "2025-05-30", "name": "Karembe"}, {"date": "2025-05-31", "name": "Fonso"}, {"date": "2025-06-01", "name": "Yago"}, {"date": "2025-06-02", "name": "Mario"}, {"date": "2025-06-03", "name": "Mario"}, {"date": "2025-06-04", "name": "Castro"}, {"date": "2025-06-05", "name": "Karembe"}, {"date": "2025-06-06", "name": "Sergi"}, {"date": "2025-06-07", "name": "Gabri"}, {"date": "2025-06-08", "name": "Jacobo"}, {"date": "2025-06-09", "name": "Fonso"}, {"date": "2025-06-10", "name": "León"}, {"date": "2025-06-11", "name": "Gabri"}, {"date": "2025-06-12", "name": "Tacho"}, {"date": "2025-06-13", "name": "Rubén"}, {"date": "2025-06-14", "name": "Jaime"}, {"date": "2025-06-15", "name": "Kike"}, {"date": "2025-06-16", "name": "Sergi"}, {"date": "2025-06-17", "name": "Huerta"}, {"date": "2025-06-18", "name": "Rubén"}, {"date": "2025-06-19", "name": "Sergi"}, {"date": "2025-06-20", "name": "Capi"}, {"date": "2025-06-21", "name": "León"}, {"date": "2025-06-22", "name": "Sergi"}, {"date": "2025-06-23", "name": "Raúl"}, {"date": "2025-06-24", "name": "Lucas"}, {"date": "2025-06-25", "name": "Jacobo"}, {"date": "2025-06-26", "name": "Dani"}, {"date": "2025-06-27", "name": "Capi"}, {"date": "2025-06-28", "name": "Dani"}, {"date": "2025-06-29", "name": "Rubén"}, {"date": "2025-06-30", "name": "Huerta"}, {"date": "2025-07-01", "name": "Jacobo"}, {"date": "2025-07-02", "name": "Mario"}, {"date": "2025-07-03", "name": "Karembe"}, {"date": "2025-07-04", "name": "Sergi"}, {"date": "2025-07-05", "name": "Jacobo"}, {"date": "2025-07-06", "name": "Tripi"}, {"date": "2025-07-07", "name": "Jaime"}, {"date": "2025-07-08", "name": "Lucas"}, {"date": "2025-07-09", "name": "Sergi"}, {"date": "2025-07-10", "name": "Jacobo"}, {"date": "2025-07-11", "name": "Yago"}, {"date": "2025-07-12", "name": "Jaime"}, {"date": "2025-07-13", "name": "Gabri"}, {"date": "2025-07-14", "name": "León"}, {"date": "2025-07-15", "name": "Tripi"}, {"date": "2025-07-16", "name": "Sergi"}, {"date": "2025-07-17", "name": "Yago"}, {"date": "2025-07-18", "name": "Lawi"}, {"date": "2025-07-19", "name": "Jaime"}, {"date": "2025-07-20", "name": "Karembe"}, {"date": "2025-07-21", "name": "Raúl"}, {"date": "2025-07-22", "name": "David"}, {"date": "2025-07-23", "name": "Dani"}, {"date": "2025-07-24", "name": "Tripi"}, {"date": "2025-07-25", "name": "León"}, {"date": "2025-07-26", "name": "Castro"}, {"date": "2025-07-27", "name": "Lucas"}, {"date": "2025-07-28", "name": "Fonso"}, {"date": "2025-07-29", "name": "Capi"}, {"date": "2025-07-30", "name": "Castro"}, {"date": "2025-07-31", "name": "Fonso"}, {"date": "2025-08-01", "name": "Lawi"}, {"date": "2025-08-02", "name": "Gabri"}, {"date": "2025-08-03", "name": "Karembe"}, {"date": "2025-08-04", "name": "León"}, {"date": "2025-08-05", "name": "Dani"}, {"date": "2025-08-06", "name": "Jaime"}, {"date": "2025-08-07", "name": "David"}, {"date": "2025-08-08", "name": "Raúl"}, {"date": "2025-08-09", "name": "Castro"}, {"date": "2025-08-10", "name": "Mario"}, {"date": "2025-08-11", "name": "Gonzalo"}, {"date": "2025-08-12", "name": "Karembe"}, {"date": "2025-08-13", "name": "Tacho"}, {"date": "2025-08-14", "name": "Lucas"}, {"date": "2025-08-15", "name": "León"}, {"date": "2025-08-16", "name": "Tripi"}, {"date": "2025-08-17", "name": "Karembe"}, {"date": "2025-08-18", "name": "Kike"}, {"date": "2025-08-19", "name": "Karembe"}, {"date": "2025-08-20", "name": "León"}, {"date": "2025-08-21", "name": "Gabri"}, {"date": "2025-08-22", "name": "Yago"}, {"date": "2025-08-23", "name": "Sergi"}, {"date": "2025-08-24", "name": "Kike"}, {"date": "2025-08-25", "name": "Dani"}, {"date": "2025-08-26", "name": "Jacobo"}, {"date": "2025-08-27", "name": "Dani"}, {"date": "2025-08-28", "name": "Lucas"}, {"date": "2025-08-29", "name": "Gabri"}, {"date": "2025-08-30", "name": "Raúl"}, {"date": "2025-08-31", "name": "Lawi"}, {"date": "2025-09-01", "name": "Tacho"}, {"date": "2025-09-02", "name": "Rubén"}, {"date": "2025-09-03", "name": "Mario"}, {"date": "2025-09-04", "name": "Lucas"}, {"date": "2025-09-05", "name": "Dani"}, {"date": "2025-09-06", "name": "Tripi"}, {"date": "2025-09-07", "name": "Dani"}, {"date": "2025-09-08", "name": "León"}, {"date": "2025-09-09", "name": "Sergi"}, {"date": "2025-09-10", "name": "Karembe"}, {"date": "2025-09-11", "name": "Karembe"}, {"date": "2025-09-12", "name": "Fonso"}, {"date": "2025-09-13", "name": "Huerta"}, {"date": "2025-09-14", "name": "David"}, {"date": "2025-09-15", "name": "Sergi"}, {"date": "2025-09-16", "name": "Karembe"}, {"date": "2025-09-17", "name": "Jaime"}, {"date": "2025-09-18", "name": "Castro"}, {"date": "2025-09-19", "name": "Sergi"}, {"date": "2025-09-20", "name": "Capi"}, {"date": "2025-09-21", "name": "Jacobo"}, {"date": "2025-09-22", "name": "Yago"}, {"date": "2025-09-23", "name": "Mario"}, {"date": "2025-09-24", "name": "Dani"}, {"date": "2025-09-25", "name": "Huerta"}, {"date": "2025-09-26", "name": "Lucas"}, {"date": "2025-09-27", "name": "Capi"}, {"date": "2025-09-28", "name": "Fonso"}, {"date": "2025-09-29", "name": "Dani"}, {"date": "2025-09-30", "name": "Lucas"}, {"date": "2025-10-01", "name": "Jacobo"}, {"date": "2025-10-02", "name": "Yago"}, {"date": "2025-10-03", "name": "Rubén"}, {"date": "2025-10-04", "name": "Karembe"}, {"date": "2025-10-05", "name": "Tripi"}, {"date": "2025-10-06", "name": "Yago"}, {"date": "2025-10-07", "name": "León"}, {"date": "2025-10-08", "name": "Rubén"}, {"date": "2025-10-09", "name": "Lucas"}, {"date": "2025-10-10", "name": "Capi"}, {"date": "2025-10-11", "name": "Dani"}, {"date": "2025-10-12", "name": "David"}, {"date": "2025-10-13", "name": "Tripi"}, {"date": "2025-10-14", "name": "Lucas"}, {"date": "2025-10-15", "name": "Jacobo"}, {"date": "2025-10-16", "name": "Dani"}, {"date": "2025-10-17", "name": "Dani"}, {"date": "2025-10-18", "name": "Jaime"}, {"date": "2025-10-19", "name": "Lucas"}, {"date": "2025-10-20", "name": "Lawi"}, {"date": "2025-10-21", "name": "Lucas"}, {"date": "2025-10-22", "name": "Yago"}, {"date": "2025-10-23", "name": "Rubén"}, {"date": "2025-10-24", "name": "Tacho"}, {"date": "2025-10-25", "name": "Lawi"}, {"date": "2025-10-26", "name": "Jacobo"}, {"date": "2025-10-27", "name": "Castro"}, {"date": "2025-10-28", "name": "Gabri"}, {"date": "2025-10-29", "name": "Lucas"}, {"date": "2025-10-30", "name": "Fonso"}, {"date": "2025-10-31", "name": "Lucas"}, {"date": "2025-11-01", "name": "Lucas"}, {"date": "2025-11-02", "name": "Capi"}, {"date": "2025-11-03", "name": "David"}, {"date": "2025-11-04", "name": "David"}, {"date": "2025-11-05", "name": "Fonso"}, {"date": "2025-11-06", "name": "David"}, {"date": "2025-11-07", "name": "Tacho"}, {"date": "2025-11-08", "name": "Castro"}, {"date": "2025-11-09", "name": "Jacobo"}, {"date": "2025-11-10", "name": "Capi"}, {"date": "2025-11-11", "name": "Mario"}, {"date": "2025-11-12", "name": "Lucas"}, {"date": "2025-11-13", "name": "Tacho"}, {"date": "2025-11-14", "name": "Karembe"}, {"date": "2025-11-15", "name": "Rubén"}, {"date": "2025-11-16", "name": "Kike"}, {"date": "2025-11-17", "name": "Lucas"}, {"date": "2025-11-18", "name": "Mario"}, {"date": "2025-11-19", "name": "Mario"}, {"date": "2025-11-21", "name": "Gonzalo"}, {"date": "2025-11-22", "name": "León"}, {"date": "2025-11-23", "name": "Gonzalo"}, {"date": "2025-11-25", "name": "Fonso"}, {"date": "2025-11-26", "name": "Dani"}, {"date": "2025-11-27", "name": "Tacho"}, {"date": "2025-11-28", "name": "Gonzalo"}, {"date": "2025-11-29", "name": "David"}, {"date": "2025-11-30", "name": "Rubén"}, {"date": "2025-12-01", "name": "Sergi"}, {"date": "2025-12-02", "name": "Tacho"}, {"date": "2025-12-03", "name": "Castro"}, {"date": "2025-12-04", "name": "Jaime"}, {"date": "2025-12-05", "name": "León"}, {"date": "2025-12-06", "name": "David"}, {"date": "2025-12-07", "name": "Lucas"}, {"date": "2025-12-08", "name": "Huerta"}, {"date": "2025-12-09", "name": "David"}, {"date": "2025-12-10", "name": "Rubén"}, {"date": "2025-12-11", "name": "Tripi"}, {"date": "2025-12-12", "name": "Tacho"}, {"date": "2025-12-13", "name": "Karembe"}, {"date": "2025-12-14", "name": "Karembe"}, {"date": "2025-12-15", "name": "Sergi"}, {"date": "2025-12-16", "name": "Sergi"}, {"date": "2025-12-17", "name": "Jacobo"}, {"date": "2025-12-18", "name": "Lawi"}, {"date": "2025-12-19", "name": "Capi"}, {"date": "2025-12-20", "name": "Lawi"}, {"date": "2025-12-21", "name": "Lawi"}, {"date": "2025-12-22", "name": "Rubén"}, {"date": "2025-12-23", "name": "Tripi"}, {"date": "2025-12-24", "name": "Dani"}, {"date": "2025-12-25", "name": "Jaime"}, {"date": "2025-12-26", "name": "Sergi"}, {"date": "2025-12-27", "name": "Lucas"}, {"date": "2025-12-28", "name": "David"}, {"date": "2025-12-29", "name": "Tripi"}, {"date": "2025-12-30", "name": "Capi"}, {"date": "2025-12-31", "name": "Castro"}, {"date": "2026-01-01", "name": "Karembe"}, {"date": "2026-01-02", "name": "Fonso"}, {"date": "2026-01-03", "name": "Sergi"}, {"date": "2026-01-04", "name": "Jacobo"}, {"date": "2026-01-05", "name": "León"}, {"date": "2026-01-06", "name": "Huerta"}, {"date": "2026-01-07", "name": "Lawi"}, {"date": "2026-01-08", "name": "Capi"}, {"date": "2026-01-09", "name": "Capi"}, {"date": "2026-01-10", "name": "Castro"}, {"date": "2026-01-11", "name": "Dani"}, {"date": "2026-01-12", "name": "David"}, {"date": "2026-01-13", "name": "Castro"}, {"date": "2026-01-14", "name": "Jacobo"}, {"date": "2026-01-15", "name": "Castro"}, {"date": "2026-01-16", "name": "Fonso"}, {"date": "2026-01-17", "name": "Jaime"}, {"date": "2026-01-18", "name": "Gonzalo"}, {"date": "2026-01-19", "name": "Tacho"}, {"date": "2026-01-20", "name": "Capi"}, {"date": "2026-01-21", "name": "Gabri"}, {"date": "2026-01-22", "name": "Huerta"}, {"date": "2026-01-23", "name": "Mario"}, {"date": "2026-01-24", "name": "Tripi"}, {"date": "2026-01-25", "name": "Raúl"}, {"date": "2026-01-26", "name": "Raúl"}, {"date": "2026-01-27", "name": "Lawi"}, {"date": "2026-01-28", "name": "Tacho"}, {"date": "2026-01-29", "name": "Fonso"}, {"date": "2026-01-30", "name": "Huerta"}, {"date": "2026-01-31", "name": "Gonzalo"}, {"date": "2026-02-01", "name": "David"}, {"date": "2026-02-02", "name": "Dani"}, {"date": "2026-02-03", "name": "Lawi"}, {"date": "2026-02-04", "name": "Huerta"}, {"date": "2026-02-05", "name": "Tacho"}, {"date": "2026-02-06", "name": "David"}, {"date": "2026-02-07", "name": "Jacobo"}, {"date": "2026-02-08", "name": "Tripi"}, {"date": "2026-02-09", "name": "Tripi"}, {"date": "2026-02-10", "name": "Karembe"}, {"date": "2026-02-11", "name": "León"}, {"date": "2026-02-12", "name": "Tacho"}, {"date": "2026-02-13", "name": "Lawi"}, {"date": "2026-02-14", "name": "Tripi"}, {"date": "2026-02-15", "name": "Capi"}, {"date": "2026-02-16", "name": "Gonzalo"}, {"date": "2026-02-17", "name": "Lawi"}, {"date": "2026-02-18", "name": "Mario"}, {"date": "2026-02-19", "name": "Huerta"}, {"date": "2026-02-20", "name": "Mario"}, {"date": "2026-02-21", "name": "Castro"}, {"date": "2026-02-22", "name": "Karembe"}, {"date": "2026-02-23", "name": "León"}, {"date": "2026-02-24", "name": "Tacho"}, {"date": "2026-02-25", "name": "Lawi"}, {"date": "2026-02-26", "name": "Gonzalo"}, {"date": "2026-02-27", "name": "Lawi"}, {"date": "2026-02-28", "name": "Gonzalo"}, {"date": "2026-03-01", "name": "Yago"}, {"date": "2026-03-02", "name": "Yago"}, {"date": "2026-03-03", "name": "Kike"}, {"date": "2026-03-04", "name": "Huerta"}, {"date": "2026-03-05", "name": "Huerta"}, {"date": "2026-03-06", "name": "Dani"}, {"date": "2026-03-07", "name": "Gonzalo"}, {"date": "2026-03-08", "name": "David"}, {"date": "2026-03-09", "name": "Jacobo"}, {"date": "2026-03-10", "name": "Mario"}, {"date": "2026-03-11", "name": "Huerta"}, {"date": "2026-03-12", "name": "Rubén"}, {"date": "2026-03-13", "name": "Lucas"}, {"date": "2026-03-14", "name": "Gonzalo"}, {"date": "2026-03-15", "name": "León"}, {"date": "2026-03-16", "name": "Capi"}, {"date": "2026-03-17", "name": "Raúl"}, {"date": "2026-03-18", "name": "David"}, {"date": "2026-03-19", "name": "Jacobo"}, {"date": "2026-03-20", "name": "Jaime"}, {"date": "2026-03-21", "name": "Lawi"}, {"date": "2026-03-22", "name": "Lucas"}, {"date": "2026-03-23", "name": "Dani"}, {"date": "2026-03-24", "name": "Lucas"}, {"date": "2026-03-25", "name": "Fonso"}, {"date": "2026-03-26", "name": "Rubén"}, {"date": "2026-03-27", "name": "Kike"}, {"date": "2026-03-28", "name": "Jaime"}, {"date": "2026-03-29", "name": "Tacho"}, {"date": "2026-03-30", "name": "Tacho"}, {"date": "2026-03-31", "name": "Yago"}];
+
+    let supabase = null;
+    let rankingChart = null;
+    let allSelections = SEED_HISTORY.slice();
+    let allPlayers = DEFAULT_PLAYERS.map((name, index) => ({ id: index + 1, name }));
+    let currentSession = null;
+
+    const el = (id) => document.getElementById(id);
+    const MONTHS = [
+      { value: "all", label: "Todos los meses" },
+      { value: "1", label: "Enero" },
+      { value: "2", label: "Febrero" },
+      { value: "3", label: "Marzo" },
+      { value: "4", label: "Abril" },
+      { value: "5", label: "Mayo" },
+      { value: "6", label: "Junio" },
+      { value: "7", label: "Julio" },
+      { value: "8", label: "Agosto" },
+      { value: "9", label: "Septiembre" },
+      { value: "10", label: "Octubre" },
+      { value: "11", label: "Noviembre" },
+      { value: "12", label: "Diciembre" }
+    ];
+
+    function fmtDate(value){
+      if(!value) return "—";
+      const d = new Date(value + "T12:00:00");
+      return d.toLocaleDateString("es-ES",{day:"2-digit",month:"2-digit",year:"numeric"});
+    }
+
+    function dateToISO(dateObj){
+      return new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+    }
+
+    function showMessage(text,type="info"){
+      el("messageBox").innerHTML = `<div class="notice ${type}">${text}</div>`;
+    }
+
+    function clearMessage(){ el("messageBox").innerHTML = ""; }
+
+    function initClient(){
+      if (SUPABASE_URL.startsWith("PEGA_") || SUPABASE_ANON_KEY.startsWith("PEGA_")) {
+        return false;
+      }
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return true;
+    }
+
+    async function loadSession(){
+      if(!supabase) return;
+      const {data,error} = await supabase.auth.getSession();
+      if(error){ showMessage(error.message,"error"); return; }
+      currentSession = data.session;
+      refreshAuthUI();
+    }
+
+    function refreshAuthUI(){
+      const loggedIn = !!currentSession;
+      el("adminBox").classList.toggle("hidden", !loggedIn);
+      el("logoutBtn").classList.toggle("hidden", !loggedIn);
+      if (loggedIn) showMessage("Sesión iniciada correctamente.", "success");
+    }
+
+    function buildPlayerOptions(names){
+      return ['<option value="">Selecciona un nombre</option>']
+        .concat(names.map(name => `<option value="${String(name).replace(/"/g,"&quot;")}">${name}</option>`))
+        .join("");
+    }
+
+    function renderPlayerSelect(){
+      const names = allPlayers.length
+        ? allPlayers.map(p => p.name)
+        : DEFAULT_PLAYERS.slice().sort((a,b) => a.localeCompare(b,"es"));
+      el("playerSelect").innerHTML = buildPlayerOptions(names);
+      el("filterPlayer").innerHTML = ['<option value="all">Todos los nombres</option>']
+        .concat(names.map(name => `<option value="${String(name).replace(/"/g,"&quot;")}">${name}</option>`))
+        .join("");
+    }
+
+    async function fetchPlayers(){
+      const {data,error} = await supabase
+        .from("players")
+        .select("id, name")
+        .order("name",{ascending:true});
+      if(error) throw error;
+      allPlayers = data || [];
+      renderPlayerSelect();
+    }
+
+    async function fetchSelections(){
+      const {data,error} = await supabase
+        .from("selections")
+        .select("id, selection_date, players(name)")
+        .order("selection_date",{ascending:false});
+      if(error) throw error;
+      allSelections = (data || []).map(row => ({
+        id: row.id,
+        date: row.selection_date,
+        name: row.players?.name || "Sin nombre"
+      }));
+    }
+
+    function ensureFilterOptions(){
+      const years = [...new Set(allSelections.map(x => Number(x.date.slice(0,4))))].sort((a,b)=>b-a);
+      const yearSelect = el("filterYear");
+      const currentYear = yearSelect.value || "all";
+      yearSelect.innerHTML = `<option value="all">Todos los años</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
+      if ([...yearSelect.options].some(o => o.value === currentYear)) yearSelect.value = currentYear;
+
+      const monthSelect = el("filterMonth");
+      const currentMonth = monthSelect.value || "all";
+      monthSelect.innerHTML = MONTHS.map(m => `<option value="${m.value}">${m.label}</option>`).join("");
+      monthSelect.value = currentMonth;
+    }
+
+    function getFilteredSelections(){
+      const year = el("filterYear").value;
+      const month = el("filterMonth").value;
+      const player = el("filterPlayer").value;
+
+      return allSelections.filter(item => {
+        const y = String(new Date(item.date + "T12:00:00").getFullYear());
+        const m = String(new Date(item.date + "T12:00:00").getMonth() + 1);
+        return (year === "all" || year === y)
+          && (month === "all" || month === m)
+          && (player === "all" || player === item.name);
+      });
+    }
+
+    function renderStats(filtered){
+      el("totalSelections").textContent = filtered.length;
+      el("uniquePlayers").textContent = new Set(filtered.map(x => x.name)).size;
+      el("activeYear").textContent = el("filterYear").value === "all" ? "Todos" : el("filterYear").value;
+
+      if(filtered.length){
+        const last = filtered.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+        el("lastWinner").textContent = last.name;
+        el("lastWinnerDate").textContent = fmtDate(last.date);
+      } else {
+        el("lastWinner").textContent = "—";
+        el("lastWinnerDate").textContent = "Sin datos";
+      }
+    }
+
+    function getCounts(items){
+      const counts = {};
+      items.forEach(item => { counts[item.name] = (counts[item.name] || 0) + 1; });
+      return Object.entries(counts)
+        .map(([name,count]) => ({name,count}))
+        .sort((a,b) => b.count - a.count || a.name.localeCompare(b.name,"es"));
+    }
+
+    function renderTopList(filtered){
+      const top = getCounts(filtered).slice(0,5);
+      el("topList").innerHTML = top.length
+        ? top.map((item,idx) => `
+          <div class="list-item">
+            <div><strong>#${idx+1} ${item.name}</strong><div class="muted">${item.count} veces señalado</div></div>
+            <div class="pill">${item.count}</div>
+          </div>`).join("")
+        : '<div class="small">No hay registros con ese filtro.</div>';
+    }
+
+    function renderHistory(filtered){
+      el("historyTable").innerHTML = filtered.length
+        ? filtered.map(item => `
+          <tr>
+            <td>${fmtDate(item.date)}</td>
+            <td>${item.name}</td>
+          </tr>`).join("")
+        : '<tr><td colspan="2" class="muted">No hay resultados con ese filtro.</td></tr>';
+    }
+
+    function renderStreakList(){
+      const latestByPlayer = {};
+      allSelections.forEach(item => {
+        if (!latestByPlayer[item.name]) latestByPlayer[item.name] = item.date;
+      });
+
+      const data = Object.entries(latestByPlayer)
+        .map(([name,date]) => {
+          const days = Math.floor((new Date() - new Date(date + "T12:00:00")) / 86400000);
+          return {name,date,days};
+        })
+        .sort((a,b) => b.days - a.days || a.name.localeCompare(b.name,"es"));
+
+      el("streakList").innerHTML = data.length
+        ? data.slice(0,8).map(item => `
+          <div class="list-item">
+            <div><strong>${item.name}</strong><div class="muted">Última vez: ${fmtDate(item.date)}</div></div>
+            <div class="pill">${item.days} días</div>
+          </div>`).join("")
+        : '<div class="small">Todavía no hay registros.</div>';
+    }
+
+    function renderRankingChart(filtered){
+      const ranking = getCounts(filtered);
+      const ctx = document.getElementById("rankingChart");
+      if(rankingChart) rankingChart.destroy();
+      rankingChart = new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels: ranking.map(x => x.name),
+          datasets:[{
+            label:"Veces señalado",
+            data: ranking.map(x => x.count),
+            borderWidth:0,
+            borderRadius:8
+          }]
+        },
+        options:{
+          responsive:true,
+          plugins:{ legend:{display:false} },
+          scales:{
+            x:{ ticks:{color:"#cbd5e1"}, grid:{display:false} },
+            y:{ ticks:{color:"#cbd5e1",precision:0}, grid:{color:"rgba(255,255,255,.08)"} }
+          }
+        }
+      });
+    }
+
+    function renderAllViews(){
+      ensureFilterOptions();
+      renderPlayerSelect();
+      const filtered = getFilteredSelections();
+      renderStats(filtered);
+      renderTopList(filtered);
+      renderHistory(filtered);
+      renderStreakList();
+      renderRankingChart(filtered);
+    }
+
+    async function refreshAll(){
+      clearMessage();
+      if(!supabase && !initClient()){
+        renderAllViews();
+        return;
+      }
+      try{
+        await loadSession();
+        await fetchPlayers();
+        await fetchSelections();
+        renderAllViews();
+      }catch(error){
+        console.error(error);
+        showMessage(error.message || "Error cargando los datos.","error");
+      }
+    }
+
+    async function login(){
+      clearMessage();
+      if(!supabase && !initClient()) return;
+      const email = el("emailInput").value.trim();
+      const password = el("passwordInput").value;
+      if(!email || !password){
+        showMessage("Introduce email y contraseña.","error");
+        return;
+      }
+      const {data,error} = await supabase.auth.signInWithPassword({email,password});
+      if(error){ showMessage(error.message,"error"); return; }
+      currentSession = data.session;
+      refreshAuthUI();
+    }
+
+    async function logout(){
+      const {error} = await supabase.auth.signOut();
+      if(error){ showMessage(error.message,"error"); return; }
+      currentSession = null;
+      el("adminBox").classList.add("hidden");
+      el("logoutBtn").classList.add("hidden");
+      showMessage("Sesión cerrada.","info");
+    }
+
+    async function ensurePlayerByName(name){
+      const clean = (name || "").trim();
+      if(!clean) return null;
+
+      let existing = allPlayers.find(p => p.name.toLowerCase() === clean.toLowerCase());
+      if(existing) return existing.id;
+
+      const {data,error} = await supabase.from("players").insert({name: clean}).select("id, name").single();
+      if(error){
+        const duplicate = String(error.message || "").toLowerCase().includes("duplicate") || String(error.code || "") === "23505";
+        if(!duplicate) throw error;
+      }
+      await fetchPlayers();
+      existing = allPlayers.find(p => p.name.toLowerCase() === clean.toLowerCase());
+      return existing ? existing.id : data?.id || null;
+    }
+
+    async function saveSelection(advanceDate = false){
+      clearMessage();
+      if(!currentSession){
+        showMessage("Primero inicia sesión.","error");
+        return;
+      }
+
+      const date = el("dateInput").value;
+      const playerName = el("playerSelect").value;
+
+      if(!date){ showMessage("La fecha es obligatoria.","error"); return; }
+      if(!playerName){ showMessage("Selecciona un nombre.","error"); return; }
+
+      try{
+        const playerId = await ensurePlayerByName(playerName);
+        const {error} = await supabase.from("selections").insert({
+          selection_date: date,
+          player_id: playerId
+        });
+        if(error){ showMessage(error.message,"error"); return; }
+
+        showMessage("Registro guardado correctamente.","success");
+        el("playerSelect").value = "";
+        if(advanceDate){
+          const d = new Date(date + "T12:00:00");
+          d.setDate(d.getDate() + 1);
+          el("dateInput").value = dateToISO(d);
+        }
+        await refreshAll();
+      }catch(error){
+        showMessage(error.message || "No se pudo guardar.","error");
+      }
+    }
+
+    async function importSeedHistory(){
+      clearMessage();
+      if(!currentSession){
+        showMessage("Primero inicia sesión.","error");
+        return;
+      }
+      if(!confirm("Esto intentará importar todo el histórico del Excel. Las fechas que ya existan fallarán por duplicado y se ignorarán. ¿Seguir?")) return;
+
+      try{
+        for (const name of DEFAULT_PLAYERS){
+          await ensurePlayerByName(name);
+        }
+
+        const playerMap = {};
+        allPlayers.forEach(p => playerMap[p.name] = p.id);
+
+        const payload = SEED_HISTORY
+          .filter(item => playerMap[item.name])
+          .map(item => ({
+            selection_date: item.date,
+            player_id: playerMap[item.name]
+          }));
+
+        const {error} = await supabase
+          .from("selections")
+          .upsert(payload, { onConflict: "selection_date", ignoreDuplicates: true });
+
+        if(error){
+          const msg = String(error.message || "");
+          if (!msg.toLowerCase().includes("ignoreduplicates")) throw error;
+        }
+
+        showMessage("Importación completada. Si ya había fechas cargadas, simplemente se han dejado como estaban.","success");
+        await refreshAll();
+      }catch(error){
+        console.error(error);
+        showMessage(error.message || "No se pudo importar el histórico.","error");
+      }
+    }
+
+    function setToday(){
+      el("dateInput").value = dateToISO(new Date());
+    }
+
+    function bindEvents(){
+      el("refreshBtn").addEventListener("click", refreshAll);
+      el("toggleAdminBtn").addEventListener("click", () => el("adminCard").classList.toggle("hidden"));
+      el("loginBtn").addEventListener("click", login);
+      el("logoutBtn").addEventListener("click", logout);
+      el("saveBtn").addEventListener("click", () => saveSelection(false));
+      el("saveAndNextBtn").addEventListener("click", () => saveSelection(true));
+      el("importSeedBtn").addEventListener("click", importSeedHistory);
+      el("filterYear").addEventListener("change", renderAllViews);
+      el("filterMonth").addEventListener("change", renderAllViews);
+      el("filterPlayer").addEventListener("change", renderAllViews);
+    }
+
+    renderPlayerSelect();
+    setToday();
+    bindEvents();
+    refreshAll();
+  </script>
+</body>
+</html>
