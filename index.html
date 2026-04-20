@@ -306,10 +306,21 @@
       const names = allPlayers.length
         ? allPlayers.map(p => p.name)
         : DEFAULT_PLAYERS.slice().sort((a,b) => a.localeCompare(b,"es"));
+
+      const currentAdminPlayer = el("playerSelect")?.value || "";
+      const currentFilterPlayer = el("filterPlayer")?.value || "all";
+
       el("playerSelect").innerHTML = buildPlayerOptions(names);
       el("filterPlayer").innerHTML = ['<option value="all">Todos los nombres</option>']
         .concat(names.map(name => `<option value="${String(name).replace(/"/g,"&quot;")}">${name}</option>`))
         .join("");
+
+      if ([...el("playerSelect").options].some(o => o.value === currentAdminPlayer)) {
+        el("playerSelect").value = currentAdminPlayer;
+      }
+      if ([...el("filterPlayer").options].some(o => o.value === currentFilterPlayer)) {
+        el("filterPlayer").value = currentFilterPlayer;
+      }
     }
 
     async function fetchPlayers(){
@@ -601,7 +612,15 @@
 
     function bindEvents(){
       el("refreshBtn").addEventListener("click", refreshAll);
-      el("toggleAdminBtn").addEventListener("click", () => el("adminCard").classList.toggle("hidden"));
+      el("toggleAdminBtn").addEventListener("click", () => {
+        const card = el("adminCard");
+        const wasHidden = card.classList.contains("hidden");
+        card.classList.toggle("hidden");
+        el("toggleAdminBtn").textContent = wasHidden ? "Ocultar admin" : "Admin";
+        if (wasHidden) {
+          setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+        }
+      });
       el("loginBtn").addEventListener("click", login);
       el("logoutBtn").addEventListener("click", logout);
       el("saveBtn").addEventListener("click", () => saveSelection(false));
