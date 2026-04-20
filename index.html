@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pachanga Waterpolo</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     :root{
       --bg:#0f172a;
@@ -273,6 +273,10 @@
       if (SUPABASE_URL.startsWith("PEGA_") || SUPABASE_ANON_KEY.startsWith("PEGA_")) {
         return false;
       }
+      if (!window.supabase || !window.supabase.createClient) {
+        console.warn("Supabase client no disponible; se usará el histórico embebido.");
+        return false;
+      }
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       return true;
     }
@@ -429,29 +433,53 @@
     }
 
     function renderRankingChart(filtered){
-      const ranking = getCounts(filtered);
-      const ctx = document.getElementById("rankingChart");
-      if(rankingChart) rankingChart.destroy();
-      rankingChart = new Chart(ctx,{
-        type:"bar",
-        data:{
-          labels: ranking.map(x => x.name),
-          datasets:[{
-            label:"Veces señalado",
-            data: ranking.map(x => x.count),
-            borderWidth:0,
-            borderRadius:8
-          }]
-        },
-        options:{
-          responsive:true,
-          plugins:{ legend:{display:false} },
-          scales:{
-            x:{ ticks:{color:"#cbd5e1"}, grid:{display:false} },
-            y:{ ticks:{color:"#cbd5e1",precision:0}, grid:{color:"rgba(255,255,255,.08)"} }
+      const canvas = document.getElementById("rankingChart");
+      const ranking = getCounts(filtered).slice(0,10);
+      if (!canvas) return;
+      const parent = canvas.parentElement;
+      if (window.Chart) {
+        const ctx = canvas.getContext("2d");
+        if(rankingChart) rankingChart.destroy();
+        rankingChart = new Chart(ctx,{
+          type:"bar",
+          data:{
+            labels: ranking.map(x => x.name),
+            datasets:[{
+              label:"Veces señalado",
+              data: ranking.map(x => x.count),
+              borderWidth:0,
+              borderRadius:8
+            }]
+          },
+          options:{
+            responsive:true,
+            plugins:{ legend:{display:false} },
+            scales:{
+              x:{ ticks:{color:"#cbd5e1"}, grid:{display:false} },
+              y:{ ticks:{color:"#cbd5e1",precision:0}, grid:{color:"rgba(255,255,255,.08)"} }
+            }
           }
-        }
-      });
+        });
+        canvas.classList.remove('hidden');
+        const fallback = document.getElementById('rankingFallback');
+        if (fallback) fallback.remove();
+        return;
+      }
+      canvas.classList.add('hidden');
+      let fallback = document.getElementById('rankingFallback');
+      if (!fallback) {
+        fallback = document.createElement('div');
+        fallback.id = 'rankingFallback';
+        fallback.className = 'list';
+        parent.appendChild(fallback);
+      }
+      fallback.innerHTML = ranking.length
+        ? ranking.map((item,idx) => `
+          <div class="list-item">
+            <div><strong>#${idx+1} ${item.name}</strong><div class="muted">${item.count} veces señalado</div></div>
+            <div class="pill">${item.count}</div>
+          </div>`).join("")
+        : '<div class="small">No hay registros.</div>';
     }
 
     function renderAllViews(){
@@ -584,10 +612,25 @@
       el("filterPlayer").addEventListener("change", renderAllViews);
     }
 
-    renderPlayerSelect();
-    setToday();
-    bindEvents();
-    refreshAll();
+    function boot(){
+      try {
+        renderPlayerSelect();
+        setToday();
+        bindEvents();
+        renderAllViews();
+        refreshAll();
+      } catch (error) {
+        console.error(error);
+        const box = document.getElementById('messageBox');
+        if (box) box.innerHTML = `<div class="notice error">Error al iniciar la página: ${error.message}</div>`;
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
   </script>
 </body>
 </html>
